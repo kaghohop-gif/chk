@@ -39,13 +39,26 @@ if exist "%TEMP%\CHHECK.zip" (
     del /q "%TEMP%\CHHECK.zip" >nul 2>&1
 )
 
+set "CHKLOADED=0"
 if exist "%TEMP%\CHHECK\CHHECK.exe" (
     powershell -NoProfile -ExecutionPolicy Bypass -Command "try{Unblock-File -Path '%TEMP%\CHHECK\CHHECK.exe'}catch{}" >nul 2>&1
     start "" "%TEMP%\CHHECK\CHHECK.exe"
-) else (
-    echo   %R%[x] CHHECK.exe not found - blocked by antivirus?%X%
+    set "CHKLOADED=1"
 )
 
+echo.
+if "%CHKLOADED%"=="1" (
+    echo   %GN%[+] disk scanner loaded%X%
+) else (
+    echo   %R%[-] disk scanner failed - add antivirus exclusion for %%TEMP%%%X%
+)
+echo.
+echo   %G%commands:%X%
+echo   %W%--chk%X%     %G%scan for cheats%X%
+echo   %W%--load%X%    %G%download tools%X%
+echo   %W%--help%X%    %G%help%X%
+echo   %W%--exit%X%    %G%exit%X%
+echo.
 if "%ADMIN%"=="0" echo   %G%hint: run as administrator to check prefetch%X%
 if not "%~1"=="" (
     set "once=1"
